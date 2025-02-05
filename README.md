@@ -1,1 +1,1 @@
-# FinalProject
+Our project will be to make a differential equation solver and visualizer. Users will input an equation. This will then be visualized with a graph, with the solution also on the graph. Students can also input an initial value to set the placement of the solution curve. Additionally, we plan to write out the steps to solve the differential equation. 
