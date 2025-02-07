@@ -1,9 +1,6 @@
 def ToDoList():
 #Neil has edit this file
 #Louis also yeah
-    command1 = "add"
-    command2 = "remove"
-    command3 = "list"
     print(
         "This is a simple to do list. To add a new item, enter 'add'. To remove an item, enter 'remove'. To see all items, enter 'list'.")
     taskList = []
