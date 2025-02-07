@@ -29,8 +29,12 @@ def ToDoList():
             elif command != command1 or command != command2 or command != command3:
                 print("Invalid input. Please enter 'add', 'remove' or 'list'.")
                 break
-
-ToDoList()
+# ==============================================================================
+def main():
+    ToDoList()
+# ==============================================================================
+if __name__ == "__main__":
+    main()
 
 
 
