@@ -38,7 +38,8 @@ def removeCourses(array1):
 
 # ==============================================================================
 def main():
-    availableCourses = ["Course 1", "Course 2", "Course 3", "Course 4", "Course 5"]
+    availableCourses = ["Chemistry", "Physics 1", "Physics 2", "Calculus 1", "Calculus 2", "Calculus 3",
+                        "Differential Equations", "Computing Fundamentals", "Cornerstone 1", "Cornerstone 2"]
     userCourses = []
     print("It's time to register for classes!")
     while True:
