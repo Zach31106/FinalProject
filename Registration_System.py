@@ -7,9 +7,12 @@ def viewCourses(array):
 
 def addCourses(array1, array2):
     number = int(input("Enter the course number you'd like to register for:\n"))
-    array1.append(array2[number - 1])
-    return array1
-
+    try:
+        array1.append(array2[number - 1])
+        return array1
+    except IndexError:
+        print("The course number you entered is out of range")
+        addCourses(array1, array2)
 
 def removeCourses(array1):
     print("These are your current courses:")
@@ -17,18 +20,23 @@ def removeCourses(array1):
     for item in array1:
         print(i, item)
         i += 1
-    number = int(input("Enter the course number you'd like to remove:\n"))
-    array1.remove(array1[number - 1])
-    return array1
+    try:
+        number = int(input("Enter the course number you'd like to remove:\n"))
+        array1.remove(array1[number - 1])
+        return array1
+    except IndexError:
+        print("The course number you entered is out of range")
+        removeCourses(array1)
 
 
 # ==============================================================================
 def main():
     availableCourses = ["Course 1", "Course 2", "Course 3", "Course 4", "Course 5"]
     userCourses = []
-    print(
-        "It's time to register for classes! To view available courses type 'courses'. To register type 'add'. To remove type 'remove'. To see your current courses type 'view'. To quit type 'quit'.")
+    print("It's time to register for classes!")
     while True:
+        print(
+        "To view available courses type 'courses'. To register type 'add'. To remove type 'remove'. To see your current courses type 'view'. To quit type 'quit'.")
         choice = input("What would you like to do?\n")
         if choice == "courses":
             print("The following courses are available for registration:")
@@ -44,7 +52,10 @@ def main():
                 print("You can only have 3 courses")
 
         elif choice == "remove":
-            removeCourses(userCourses)
+            if len(userCourses) == 0:
+                print("You have no courses!")
+            else:
+                removeCourses(userCourses)
 
         elif choice == "view":
             if len(userCourses) == 0:
