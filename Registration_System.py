@@ -3,10 +3,14 @@ def viewCourses(array):
     for item in array:
         print(i, item)
         i += 1
+
+
 def addCourses(array1, array2):
     number = int(input("Enter the course number you'd like to register for:\n"))
     array1.append(array2[number - 1])
     return array1
+
+
 def removeCourses(array1):
     print("These are your current courses:")
     i = 1
@@ -51,6 +55,8 @@ def main():
             break
         else:
             print("Invalid choice.")
+
+
 # ==============================================================================
 if __name__ == "__main__":
     main()
