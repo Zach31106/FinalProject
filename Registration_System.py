@@ -16,26 +16,41 @@ def removeCourses(array1):
     number = int(input("Enter the course number you'd like to remove:\n"))
     array1.remove(array1[number - 1])
     return array1
-def registration():
+
+
+# ==============================================================================
+def main():
     availableCourses = ["Course 1", "Course 2", "Course 3", "Course 4", "Course 5"]
     userCourses = []
-    print("It's time to register for classes! To view available courses type 'courses'. To register type 'add'. To remove type 'remove'. To see your current courses type 'view'.")
+    print(
+        "It's time to register for classes! To view available courses type 'courses'. To register type 'add'. To remove type 'remove'. To see your current courses type 'view'. To quit type 'quit'.")
     while True:
         choice = input("What would you like to do?\n")
         if choice == "courses":
             print("The following courses are available for registration:")
             viewCourses(availableCourses)
+
+
         elif choice == "add":
-            addCourses(userCourses, availableCourses)
+            if len(userCourses) < 3:
+                print("Here are the available courses:")
+                viewCourses(availableCourses)
+                addCourses(userCourses, availableCourses)
+            else:
+                print("You can only have 3 courses")
+
         elif choice == "remove":
             removeCourses(userCourses)
+
         elif choice == "view":
-            viewCourses(userCourses)
+            if len(userCourses) == 0:
+                print("You have no courses!")
+            else:
+                viewCourses(userCourses)
+        elif choice == "quit":
+            break
         else:
             print("Invalid choice.")
-# ==============================================================================
-def main():
-    registration()
 # ==============================================================================
 if __name__ == "__main__":
     main()
