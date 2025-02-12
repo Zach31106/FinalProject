@@ -6,13 +6,17 @@ def viewCourses(array):
 
 
 def addCourses(array1, array2):
-    number = int(input("Enter the course number you'd like to register for:\n"))
     try:
+        number = int(input("Enter the course number you'd like to register for:\n"))
         array1.append(array2[number - 1])
         return array1
+    except ValueError:
+        print("Please enter a number.")
+        addCourses(array1, array2)
     except IndexError:
         print("The course number you entered is out of range")
         addCourses(array1, array2)
+
 
 def removeCourses(array1):
     print("These are your current courses:")
@@ -25,7 +29,10 @@ def removeCourses(array1):
         array1.remove(array1[number - 1])
         return array1
     except IndexError:
-        print("The course number you entered is out of range")
+        print("You aren't enrolled for that course.")
+        removeCourses(array1)
+    except ValueError:
+        print("Please enter a number.")
         removeCourses(array1)
 
 
@@ -36,7 +43,7 @@ def main():
     print("It's time to register for classes!")
     while True:
         print(
-        "To view available courses type 'courses'. To register type 'add'. To remove type 'remove'. To see your current courses type 'view'. To quit type 'quit'.")
+            "To view available courses type 'courses'. To register type 'add'. To remove type 'remove'. To see your current courses type 'view'. To quit type 'quit'.")
         choice = input("What would you like to do?\n")
         if choice == "courses":
             print("The following courses are available for registration:")
