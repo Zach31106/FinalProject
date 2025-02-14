@@ -7,9 +7,11 @@ def viewCourses(array):
 
 def addCourses(array1, array2):
     # ask the user for which course to add
+    # removes course from available courses so that students can't register to the same course multiple times
     try:
         number = int(input("Enter the course number you'd like to register for:\n"))
         array1.append(array2[number - 1])
+        array2.remove(array2[number - 1])
         return array1
     # if the user doesn't put a number, then the error pops up
     # uses except and then asks the user again
@@ -22,14 +24,16 @@ def addCourses(array1, array2):
         addCourses(array1, array2)
 
 
-def removeCourses(array1):
+def removeCourses(array1, array2):
     # shows the courses that can be removed
     print("These are your current courses:")
     # shows the course to remove
     viewCourses(array1)
     # asks for the course to remove
+    # adds the removed course back to available courses
     try:
         number = int(input("Enter the course number you'd like to remove:\n"))
+        array2.append(array1[number - 1])
         array1.remove(array1[number - 1])
         return array1
     # if the user enters a number outside the range ask the user again
@@ -45,7 +49,7 @@ def removeCourses(array1):
 # ==============================================================================
 def main():
     # creates list to store data
-    availableCourses = ["Course 1", "Course 2", "Course 3", "Course 4", "Course 5"]
+    availableCourses = ["Chemistry 1", "Physics 1", "Physics 2", "Calculus 1", "Calculus 2", "Calculus 3", "Differential Equations", "Computing Fundamentals", "Cornerstone 1", "Cornerstone 2"]
     userCourses = []
     print("It's time to register for classes!")
     # loop through the functions that the user can do
@@ -79,7 +83,7 @@ def main():
             if len(userCourses) == 0:
                 print("You have no courses!")
             else:
-                removeCourses(userCourses)
+                removeCourses(userCourses, availableCourses)
                 print("Course removed!")
         # call the view function to see what course user already has added
         elif choice == "view":
