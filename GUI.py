@@ -2,18 +2,22 @@ import tkinter as tk
 from tkinter import *
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import numpy as np
 
 
 def main():
     # Window set up
     window = tk.Tk()
     window.title("Differential Equation Visualizer and Solver")
-    window.geometry("800x600")
+    window.geometry("900x500")
     window.resizable(width=False, height=False)
+    window.eval("tk::PlaceWindow . center")
 
     # Data
-    x = [1, 2, 3, 4, 5]
-    y = [2, 5, 3, 6, 4]
+    #x = [1, 2, 3, 4, 5]
+    #y = [2, 5, 3, 6, 4]
+    x = np.linspace(-np.pi, np.pi, 100)
+    y = np.sin(x)
 
     # Draw graph
     def drawChart():
@@ -106,7 +110,6 @@ def main():
 
     # Window main loop
     window.mainloop()
-
 
 if __name__ == "__main__":
     main()
