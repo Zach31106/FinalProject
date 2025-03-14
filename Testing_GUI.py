@@ -89,4 +89,4 @@ def use2(): #text editor
 
     window.mainloop()
 
-use2()
+use1()
