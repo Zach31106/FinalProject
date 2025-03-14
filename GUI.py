@@ -1,8 +1,10 @@
-def main():
-    import tkinter as tk
-    import matplotlib.pyplot as plt
-    from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+import tkinter as tk
+from tkinter import *
+import matplotlib.pyplot as plt
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 
+
+def main():
     # Window set up
     window = tk.Tk()
     window.title("Differential Equation Visualizer and Solver")
@@ -40,8 +42,8 @@ def main():
                     pointList_y.insert(tk.END, number)
                 except ValueError:
                     pass  # Ignore non-numeric values
-        pointInput.delete(0, 'end')
-        drawChart()
+            pointInput.delete(0, 'end')
+            drawChart()
 
     # Graph initialization
     fig, ax = plt.subplots()
@@ -61,8 +63,24 @@ def main():
     pointButton.grid(row=0, column=1, sticky="w")
 
     # Point list
-    pointList_x = tk.Listbox(master=window, width=5)
-    pointList_y = tk.Listbox(master=window, width=5)
+    frm_points = tk.Frame(master=window)
+
+    pointList_x = tk.Listbox(master=frm_points, width=5, height=5)
+    pointList_y = tk.Listbox(master=frm_points, width=5, height=5)
+
+    scrollbar_x = Scrollbar(master=frm_points)
+    scrollbar_y = Scrollbar(master=frm_points)
+
+    pointList_x.config(yscrollcommand=scrollbar_x.set)
+    pointList_y.config(yscrollcommand=scrollbar_y.set)
+
+    scrollbar_x.config(command=pointList_x.yview)
+    scrollbar_y.config(command=pointList_y.yview)
+
+    pointList_x.grid(row=0, column=0, sticky="e")
+    scrollbar_x.grid(row=0, column=1, sticky="w")
+    pointList_y.grid(row=0, column=2, sticky="e")
+    scrollbar_y.grid(row=0, column=3, sticky="w")
 
     for item in x:
         pointList_x.insert(tk.END, item)
@@ -71,10 +89,9 @@ def main():
 
     # Widgets placement
     canvas_widget.grid(row=0, column=0, rowspan=2, columnspan=3, padx=10, pady=10)
-    windowClose.grid(row=2, column=4, padx=10, pady=10, sticky="e")
+    windowClose.grid(row=2, column=3, padx=10, pady=10, sticky="e")
     frm_entry.grid(row=2, column=0, rowspan=2, padx=10, sticky="w")
-    pointList_x.grid(row=0, column=3, padx=10, pady=10)
-    pointList_y.grid(row=0, column=4, padx=10, pady=10)
+    frm_points.grid(row=0, column=3, rowspan=2, padx=10, pady=10)
 
     # Configure row weights to make them expandable
     window.rowconfigure(0, weight=1)
@@ -85,6 +102,7 @@ def main():
     window.columnconfigure(0, weight=1)
     window.columnconfigure(1, weight=1)
     window.columnconfigure(2, weight=1)
+    window.columnconfigure(3, weight=0)
 
     # Window main loop
     window.mainloop()
