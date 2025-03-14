@@ -42,30 +42,27 @@ def main():
                     pass  # Ignore non-numeric values
         pointInput.delete(0, 'end')
         drawChart()
-        print(x)
-        print(y)
-        print()
 
     # Graph initialization
     fig, ax = plt.subplots()
     ax.plot(x, y)
-    canvas = FigureCanvasTkAgg(fig, master = window)
+    canvas = FigureCanvasTkAgg(fig, master=window)
     canvas_widget = canvas.get_tk_widget()
 
     # Close window
-    windowClose = tk.Button(master = window, text = "Close Application", command = window.destroy)
+    windowClose = tk.Button(master=window, text="Close Application", command=window.destroy)
 
     # Input points
-    frm_entry = tk.Frame(master = window)
-    pointInput = tk.Entry(master = frm_entry, bg = "white", fg = "black")
-    pointButton = tk.Button(master = frm_entry, text = "Enter a point", command = graphInput)
+    frm_entry = tk.Frame(master=window)
+    pointInput = tk.Entry(master=frm_entry, bg="white", fg="black")
+    pointButton = tk.Button(master=frm_entry, text="Enter a point", command=graphInput)
 
     pointInput.grid(row=0, column=0, sticky="e")
     pointButton.grid(row=0, column=1, sticky="w")
 
-    #Point list
-    pointList_x = tk.Listbox(master = window, width = 5)
-    pointList_y = tk.Listbox(master = window, width = 5)
+    # Point list
+    pointList_x = tk.Listbox(master=window, width=5)
+    pointList_y = tk.Listbox(master=window, width=5)
 
     for item in x:
         pointList_x.insert(tk.END, item)
@@ -74,24 +71,24 @@ def main():
 
     # Widgets placement
     canvas_widget.grid(row=0, column=0, rowspan=2, columnspan=3, padx=10, pady=10)
-    windowClose.grid(row = 2, column = 4, padx = 10, pady = 10, sticky = "e")
-    frm_entry.grid(row = 2, column = 0, rowspan = 2, padx = 10, sticky = "w")
-    pointList_x.grid(row = 0, column = 3, padx = 10, pady = 10)
-    pointList_y.grid(row = 0, column = 4, padx = 10, pady = 10)
+    windowClose.grid(row=2, column=4, padx=10, pady=10, sticky="e")
+    frm_entry.grid(row=2, column=0, rowspan=2, padx=10, sticky="w")
+    pointList_x.grid(row=0, column=3, padx=10, pady=10)
+    pointList_y.grid(row=0, column=4, padx=10, pady=10)
 
     # Configure row weights to make them expandable
-    window.rowconfigure(0, weight = 1)
-    window.rowconfigure(1, weight = 1)
-    window.rowconfigure(2, weight = 0)
+    window.rowconfigure(0, weight=1)
+    window.rowconfigure(1, weight=1)
+    window.rowconfigure(2, weight=0)
     window.rowconfigure(3, weight=0)
     window.rowconfigure(4, weight=0)
-    window.columnconfigure(0, weight = 1)
-    window.columnconfigure(1, weight = 1)
-    window.columnconfigure(2, weight = 1)
+    window.columnconfigure(0, weight=1)
+    window.columnconfigure(1, weight=1)
+    window.columnconfigure(2, weight=1)
 
     # Window main loop
     window.mainloop()
-    canvas.draw()
+
 
 if __name__ == "__main__":
     main()
