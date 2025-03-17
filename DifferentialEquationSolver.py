@@ -7,6 +7,7 @@ import numpy as np
 
 def showButtons(frame):
     frame.grid(row=1, column=0)
+    frame.update_idletasks()
 
 def hideButtons(frame):
     frame.grid_remove()
@@ -55,9 +56,7 @@ def graphInput(funcInput, fig, canvas, x):
     inputString = funcInput.get("1.0", tk.END)
     y = np.full_like(x, eval(inputString))
     drawChart(fig, canvas, x, y)
-    funcInput.config(state=tk.NORMAL)
-    funcInput.delete("1.0", tk.END)
-    funcInput.config(state=tk.DISABLED)
+    deleteText(funcInput)
 
 def main():
     # Window set up
@@ -105,6 +104,8 @@ def main():
     LPButton.grid(row=0, column=1)
     RPButton = tk.Button(master=frm_functions, text=")", command=lambda: functionInput(equationText, ")", frm_functions))
     RPButton.grid(row=0, column=2)
+    cosineButton = tk.Button(master=frm_functions, text="cos()", command=lambda: functionInput(equationText, "np.cos(", frm_functions))
+    cosineButton.grid(row=1, column=0)
 
     # Buttons
     frm_button = tk.Frame(master=window)
