@@ -6,7 +6,11 @@ from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 
 
-def showButtons(frame):
+def showButtons(frame, all_frames):
+    # Hide all other frames to prevent overlap
+    for f in all_frames:
+        f.grid_remove()
+
     frame.grid(row=1, column=0)
     frame.update_idletasks()
 
@@ -122,7 +126,6 @@ def main():
 
     # Function buttons
     frm_functions = tk.Frame(master=window)
-    print("hit the button")
     xButton = tk.Button(master=frm_functions, text="x", command=lambda: functionInput(equationText, "x", frm_functions))
     xButton.grid(row=0, column=0)
     LPButton = tk.Button(master=frm_functions, text="(", command=lambda: functionInput(equationText, "(", frm_functions))
@@ -144,8 +147,8 @@ def main():
     eightButton = tk.Button(master=frm_button, text="8", command=lambda: numberInput(equationText, 8))
     nineButton = tk.Button(master=frm_button, text="9", command=lambda: numberInput(equationText, 9))
     zeroButton = tk.Button(master=frm_button, text="0", command=lambda: numberInput(equationText, 0))
-    operationButton = tk.Button(master=frm_button, text="Operations", command=lambda: showButtons(frm_operations))
-    functionButton = tk.Button(master=frm_button, text="Functions", command=lambda: showButtons(frm_functions))
+    operationButton = tk.Button(master=frm_button, text="Operations", command=lambda: showButtons(frm_operations, [frm_operations, frm_functions]))
+    functionButton = tk.Button(master=frm_button, text="Functions", command=lambda: showButtons(frm_functions, [frm_operations, frm_functions]))
 
     oneButton.grid(row=0, column=0)
     twoButton.grid(row=0, column=1)
