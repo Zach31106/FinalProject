@@ -1,4 +1,5 @@
 import tkinter as tk
+
 #from tkinter import * (used for scrollbar implementation)
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
@@ -52,11 +53,32 @@ def division(textBox, frame):
     inputEntry(textBox, "/")
     hideButtons(frame)
 
+
+def error_message():
+    # Create a new top-level window for the error message
+    error_window = tk.Toplevel()
+    error_window.title("Error")
+
+    # Set the size of the pop-up window
+    error_window.geometry("250x100")
+
+    # Label to display the error message
+    label = tk.Label(error_window, text="Syntax Error", font=("Arial", 12))
+    label.pack(pady=20)
+
+    # Button to close the error message pop-up
+    button = tk.Button(error_window, text="Close", command=error_window.destroy)
+    button.pack()
+
 def graphInput(funcInput, fig, canvas, x):
     inputString = funcInput.get("1.0", tk.END)
-    y = np.full_like(x, eval(inputString))
-    drawChart(fig, canvas, x, y)
-    deleteText(funcInput)
+    try:
+        y = np.full_like(x, eval(inputString))
+        drawChart(fig, canvas, x, y)
+        deleteText(funcInput)
+    except SyntaxError:
+        error_message()
+        deleteText(funcInput)
 
 def main():
     # Window set up
@@ -80,11 +102,13 @@ def main():
     # Text box
     frm_txt = tk.Frame(master=window)
     equationText = tk.Text(master=frm_txt,height=1, width=30, bg="white", fg="black")
+    #button for graph
     equationButton = tk.Button(master=frm_txt, text="Graph", command=lambda: graphInput(equationText, fig, canvas, x))
-
     equationText.grid(row=0, column=0, sticky="e")
     equationButton.grid(row=0, column=1, sticky="w")
 
+
+    #add flag var so no overlap
     # Operation buttons
     frm_operations = tk.Frame(master=window)
     additionButton = tk.Button(master=frm_operations, text="+", command=lambda: addition(equationText, frm_operations))
@@ -98,6 +122,7 @@ def main():
 
     # Function buttons
     frm_functions = tk.Frame(master=window)
+    print("hit the button")
     xButton = tk.Button(master=frm_functions, text="x", command=lambda: functionInput(equationText, "x", frm_functions))
     xButton.grid(row=0, column=0)
     LPButton = tk.Button(master=frm_functions, text="(", command=lambda: functionInput(equationText, "(", frm_functions))
