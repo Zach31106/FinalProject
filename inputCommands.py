@@ -1,19 +1,19 @@
 #Louis part
-class variable:
-    def __init__(self, type):
-        self.type = type
-x = variable("independent")
 import math
-def rational(f, g):
-    return f / g
-def exponential(c, f):
-    return math.exp(f * math.log(c, math.e))
-def cosine(f):
-    return math.cos(f)
-def addition(f, g):
-    return f + g
-def subtraction(f, g):
-    return f - g
+class functions:
+    def __init__(self, functionList, inputValue):
+        self.functionList = functionList
+        self.inputValue = inputValue
+#def rational(f, g):
+#    return f / g
+#def exponential(c, f):
+#    return math.exp(f * math.log(c, math.e))
+#def cosine(f):
+#    return math.cos(f)
+#def addition(f, g):
+#    return f + g
+#def subtraction(f, g):
+#    return f - g
 #def bracketSort(func):  #this section is useless unless we use strings but im keeping it here bc why not
     #bracketPositions = []
     #for i in range(len(func)):
@@ -30,20 +30,43 @@ def subtraction(f, g):
 listFunction = []
 def inputReceiver(inputButton):
     newInputList = []
+    parenthesesOrder = []
     if inputButton == "sinx":
-        newInputList.append(math.sin(x))
+        newInputList.append("sine")
     if inputButton == "cosx":
-        newInputList.append(math.cos(x))
+        newInputList.append("cosine")
+    if inputButton == "+":
+        newInputList.append("plus")
+    if inputButton == "-":
+        newInputList.append("minus")
     if inputButton == "*":
-        inputBuilder(listFunction, newInputList, "append")
-        newInputList = []
+        newInputList.append("times")
+    if inputButton == "/":
+        newInputList.append("divided")
+        newInputList.append("openPar")
+        parenthesesOrder.append("reg")
+    if inputButton == "lnx":
+        newInputList.append("natLog")
     if inputButton == "(":
+            newInputList.append("openPar")
+            parenthesesOrder.append("reg")
+    if inputButton == ")":
+        if parenthesesOrder[-1] == "reg":
+            newInputList.append("closePar")
+            parenthesesOrder.pop()
+        else:
+            newInputList.append("endPow")
+            parenthesesOrder.pop()
+    if inputButton == "^":
+        newInputList.append("pow")
+        parenthesesOrder.append("exp")
+
 
 
 
 
 def inputBuilder(funcList, inputList, command):
-    if
+     x=1 #get rid of error message
 
 
 

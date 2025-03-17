@@ -14,10 +14,10 @@ def main():
     window.eval("tk::PlaceWindow . center")
 
     # Data
-    #x = [1, 2, 3, 4, 5]
-    #y = [2, 5, 3, 6, 4]
-    x = np.linspace(-np.pi, np.pi, 100)
-    y = np.sin(x)
+    x = [1, 2, 3, 4, 5]
+    y = [2, 5, 3, 6, 4]
+    #x = np.linspace(-np.pi, np.pi, 100)
+    #y = np.sin(x)
 
     # Draw graph
     def drawChart():
