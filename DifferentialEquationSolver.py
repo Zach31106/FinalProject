@@ -80,6 +80,7 @@ def graphInput(funcInput, fig, canvas, x):
         y = np.full_like(x, eval(inputString))
         drawChart(fig, canvas, x, y)
         deleteText(funcInput)
+        return inputString
     except SyntaxError:
         error_message()
         deleteText(funcInput)
@@ -128,12 +129,29 @@ def main():
     frm_functions = tk.Frame(master=window)
     xButton = tk.Button(master=frm_functions, text="x", command=lambda: functionInput(equationText, "x", frm_functions))
     xButton.grid(row=0, column=0)
+    #dyButton = tk.Button(master=frm_functions, text="dy", command=lambda: functionInput(equationText, "dy", frm_functions))
+    #dyButton.grid(row=0, column=0)
+    #dxButton = tk.Button(master=frm_functions, text="dx", command=lambda: functionInput(equationText, "dx", frm_functions))
+    #dxButton.grid(row=0, column=0)
     LPButton = tk.Button(master=frm_functions, text="(", command=lambda: functionInput(equationText, "(", frm_functions))
     LPButton.grid(row=0, column=1)
     RPButton = tk.Button(master=frm_functions, text=")", command=lambda: functionInput(equationText, ")", frm_functions))
     RPButton.grid(row=0, column=2)
     cosineButton = tk.Button(master=frm_functions, text="cos()", command=lambda: functionInput(equationText, "np.cos(", frm_functions))
     cosineButton.grid(row=1, column=0)
+    sineButton = tk.Button(master=frm_functions, text="sin()", command=lambda: functionInput(equationText, "np.sin(", frm_functions))
+    sineButton.grid(row=1, column=1)
+    tangentButton = tk.Button(master=frm_functions, text="tan()", command=lambda: functionInput(equationText, "np.tan(", frm_functions))
+    tangentButton.grid(row=1, column=2)
+    logButton = tk.Button(master=frm_functions, text="log()", command=lambda: functionInput(equationText, "np.log(", frm_functions))
+    logButton.grid(row=2, column=0)
+    exponentButton = tk.Button(master=frm_functions, text="^", command=lambda: functionInput(equationText, "**(", frm_functions))
+    exponentButton.grid(row=3, column=0)
+    piButton = tk.Button(master=frm_functions, text="π", command=lambda: functionInput(equationText, "np.pi", frm_functions))
+    piButton.grid(row=4, column=0)
+    eButton = tk.Button(master=frm_functions, text="e", command=lambda: functionInput(equationText, "np.e", frm_functions))
+    eButton.grid(row=4, column=1)
+
 
     # Buttons
     frm_button = tk.Frame(master=window)
