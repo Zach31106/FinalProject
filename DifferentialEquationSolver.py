@@ -1,72 +1,70 @@
 import tkinter as tk
-
-# from tkinter import * (used for scrollbar implementation)
 import matplotlib.pyplot as plt
 from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
 import numpy as np
 
 
-def showButtons(frame, all_frames):
+def showButtons(frame, all_frames): # Function that shows groups of buttons
     for f in all_frames:
         f.grid_remove()
     frame.grid(row=1, column=0)
     frame.update_idletasks()
 
 
-def hideButtons(frame):
+def hideButtons(frame): # Function that hides groups of buttons
     frame.grid_remove()
 
 
-def deleteText(funcInput):
+def deleteText(funcInput): # Function that clears a text box
     funcInput.config(state=tk.NORMAL)
     funcInput.delete("1.0", tk.END)
     funcInput.config(state=tk.DISABLED)
 
 
-def drawChart(fig, canvas, x, y):
+def drawChart(fig, canvas, x, y): # Function that redraws a graph
     fig.clear()
     fig.add_subplot().plot(x, y)
     plt.grid(axis="both", color='gray', linestyle='--', linewidth=0.5)
     canvas.draw_idle()
 
 
-def inputEntry(textBox, command):
+def inputEntry(textBox, command): # Function that types an input into a textbox
     textEntry = str(command)
     textBox.config(state=tk.NORMAL)
     textBox.insert(tk.END, textEntry)
     textBox.config(state=tk.DISABLED)
 
 
-def numberInput(textBox, num):
+def numberInput(textBox, num): # Function that types a number into a textbox
     inputEntry(textBox, num)
 
 
-def functionInput(textBox, function, frame):
+def functionInput(textBox, function, frame): # Function that types a computational function into a textbox
     inputEntry(textBox, function)
     hideButtons(frame)
 
 
-def addition(textBox, frame):
+def addition(textBox, frame): # Function for addition
     inputEntry(textBox, "+")
     hideButtons(frame)
 
 
-def subtraction(textBox, frame):
+def subtraction(textBox, frame): # Function for subtraction
     inputEntry(textBox, "-")
     hideButtons(frame)
 
 
-def multiplication(textBox, frame):
+def multiplication(textBox, frame): # Function for multiplication
     inputEntry(textBox, "*")
     hideButtons(frame)
 
 
-def division(textBox, frame):
+def division(textBox, frame): # Function for division
     inputEntry(textBox, "/")
     hideButtons(frame)
 
 
-def errorMessage():
+def errorMessage(): # Function that handles input errors
     error_window = tk.Toplevel()
     error_window.title("Error")
     error_window.geometry("250x100")
@@ -76,7 +74,7 @@ def errorMessage():
     button.pack()
 
 
-def graphInput(funcInput, fig, canvas, x):
+def graphInput(funcInput, fig, canvas, x): # Function that graphs an inputted equation with error handling
     inputString = funcInput.get("1.0", tk.END)
     try:
         y = np.full_like(x, eval(inputString))
@@ -206,6 +204,7 @@ def main():
     resetButton.grid(row=3, column=0, padx=10, pady=10, sticky="w")
     windowClose.grid(row=3, column=0, padx=10, pady=10, sticky="e")
 
+    # Row and column configuration
     window.rowconfigure(0, weight=1)
     window.columnconfigure(0, weight=1)
 
