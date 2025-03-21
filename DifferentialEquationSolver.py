@@ -209,6 +209,9 @@ def main():
     cosineButton = tk.Button(master=frm_functions, text="cos()", command=lambda: functionInput(equationText, "np.cos(", frm_functions))
     sineButton = tk.Button(master=frm_functions, text="sin()", command=lambda: functionInput(equationText, "np.sin(", frm_functions))
     tangentButton = tk.Button(master=frm_functions, text="tan()", command=lambda: functionInput(equationText, "np.tan(", frm_functions))
+    arcsinButton = tk.Button(master=frm_functions, text="arcsin()", command=lambda: functionInput(equationText, "np.arcsin(", frm_functions))
+    arccosButton = tk.Button(master=frm_functions, text="arccos()", command=lambda: functionInput(equationText, "np.arccos(", frm_functions))
+    arctanButton = tk.Button(master=frm_functions, text="arctan()", command=lambda: functionInput(equationText, "np.arctan(", frm_functions))
     lnButton = tk.Button(master=frm_functions, text="ln()", command=lambda: functionInput(equationText, "np.log(", frm_functions))
     exitButton =tk.Button(master=frm_functions, text="Exit", command=lambda: hideButtons(frm_functions))
 
@@ -216,9 +219,13 @@ def main():
     cosineButton.grid(row=0, column=1)
     tangentButton.grid(row=0, column=2)
 
-    lnButton.grid(row=1, column=0)
+    arcsinButton.grid(row=1, column=0)
+    arccosButton.grid(row=1, column=1)
+    arctanButton.grid(row=1, column=2)
 
-    exitButton.grid(row=2, column=2, sticky="e")
+    lnButton.grid(row=2, column=0)
+
+    exitButton.grid(row=3, column=2, sticky="e")
 
     leftButton = tk.Button(master=frm_RButton, text="<-", command=lambda: None)
     rightButton = tk.Button(master=frm_RButton, text="->", command=lambda: None)
