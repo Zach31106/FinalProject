@@ -118,7 +118,8 @@ def errorMessage():  # Function that handles input errors
 def graphInput(funcInput1, funcInput2, fig, canvas_widget,
                x):  # Function that graphs an inputted equation with error handling
     global IVP1, IVP2
-
+    #XL = int(funcInput3.get("1.0", tk.END))
+    #XR = int(funcInput4.get("1.0", tk.END))
     inputString = funcInput2.get("1.0", tk.END)
     print(inputString)
     try:
@@ -129,14 +130,14 @@ def graphInput(funcInput1, funcInput2, fig, canvas_widget,
             # Define symbolic variables
             x, y2, y1, y0 = symbols('x y2 y1 y0')
 
-            # Define the differential equation: my'' + cy' + ky = 0
+            # Define the differential equation
             differential_equation = Eq(lhs, rhs)
 
             # Solve for y'' (y2)
             y2 = solve(differential_equation, y2)[0]  # Extract y''
 
             # Convert the symbolic solution into a numerical function
-            y2_function = lambdify((x, y0, y1), y2)  # y2 as a function of (y, y', m, c, k)
+            y2_function = lambdify((x, y0, y1), y2)
 
             # Initial conditions: [y(0), y'(0)]
             init_conditions = [IVP1, IVP2]
@@ -163,14 +164,14 @@ def graphInput(funcInput1, funcInput2, fig, canvas_widget,
             # Define symbolic variables
             x, y1, y0 = symbols('x, y1 y0')
 
-            # Define the differential equation: my'' + cy' + ky = 0
+            # Define the differential equation
             differential_equation = Eq(lhs, rhs)
 
             # Solve for y'' (y2)
             y1 = solve(differential_equation, y1)[0]  # Extract y''
 
             # Convert the symbolic solution into a numerical function
-            y1_function = lambdify((x, y0), y1)  # y2 as a function of (y, y', m, c, k)
+            y1_function = lambdify((x, y0), y1)
 
             # Initial conditions: [y(0), y'(0)]
             init_condition = IVP1
@@ -192,11 +193,13 @@ def graphInput(funcInput1, funcInput2, fig, canvas_widget,
             deleteText(funcInput2)
         elif "y0=" in inputString:
             inputString = inputString.split("=", 1)[1]
+            x = np.linspace(-10, 10, 1001)
             y = np.full_like(x + 2, eval(inputString))
             drawChart(fig, canvas_widget, x, y)
             deleteText(funcInput1)
             deleteText(funcInput2)
         else:
+            x = np.linspace(-10, 10, 1001)
             y = np.full_like(x, eval(inputString))
             drawChart(fig, canvas_widget, x, y)
             deleteText(funcInput1)
@@ -237,11 +240,18 @@ def main():
     frm_txt = tk.Frame(master=window)
     equationText = tk.Text(master=frm_txt, height=1, width=30, bg="white", fg="black")
     equationText.config(state=tk.DISABLED)
-    equationText.grid(row=0, column=0)
+    equationText.grid(row=0, column=0, columnspan=3)
 
     calculationText = tk.Text(master=frm_txt)
     equationText.config(state=tk.DISABLED)
 
+    #spanXL = tk.Text(master=frm_txt, height=1, width=5, bg="white", fg="black")
+    #spanXR = tk.Text(master=frm_txt, height=1, width=5, bg="white", fg="black")
+    #spanLabel = tk.Label(master=frm_txt, text="<= x <=", height=1, width=5, fg="white")
+
+    #spanXL.grid(row=1, column=0)
+    #spanLabel.grid(row=1, column=1)
+    #spanXR.grid(row=1, column=2)
     # Button frame initializations
     frm_Buttons = tk.Frame(master=window)
 
