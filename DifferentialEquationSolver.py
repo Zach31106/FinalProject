@@ -6,39 +6,8 @@ from sympy import symbols, Eq, solve, lambdify
 from sympy.parsing.sympy_parser import parse_expr
 from scipy.integrate import odeint
 
-# import sympy as sp
-
-start_x = 0
-start_y = 0
 IVP1 = 0
 IVP2 = 0
-ax = None
-canvas = None
-
-
-# Function to handle mouse button press
-def on_press(event):
-    global start_x, start_y
-    start_x = event.x
-    start_y = event.y
-
-
-# Function to handle mouse movement
-def on_move(event):
-    global start_x, start_y, ax, canvas
-    if ax is None or canvas is None:
-        return  # Ensure ax and canvas are defined before proceeding
-
-    dx = event.x - start_x
-    dy = event.y - start_y
-
-    ax.set_xlim([ax.get_xlim()[0] - dx / 10, ax.get_xlim()[1] - dx / 10])
-    ax.set_ylim([ax.get_ylim()[0] + dy / 10, ax.get_ylim()[1] + dy / 10])
-
-    canvas.draw_idle()
-
-    start_x = event.x
-    start_y = event.y
 
 
 def showButtons(frame):  # Function that shows groups of buttons
@@ -71,9 +40,7 @@ def setValue(value, funcInput):
         return
 
 
-def drawChart(fig, canvas_widget, x, y):  # Function that redraws a graph
-    global ax, canvas  # Ensure we're modifying the global ax
-
+def drawChart(fig, canvas, x, y):  # Function that redraws a graph
     fig.clear()
     ax = fig.add_subplot()  # Reassign ax properly
     ax.plot(x, y)
@@ -82,9 +49,6 @@ def drawChart(fig, canvas_widget, x, y):  # Function that redraws a graph
     ax.axhline(y=0, color='black', linewidth=1)
 
     canvas.draw_idle()
-
-    canvas_widget.bind("<ButtonPress-1>", on_press)
-    canvas_widget.bind("<B1-Motion>", on_move)
 
 
 def inputEntry(textBox1, function1, textBox2, function2):  # Function that types an input into a textbox
@@ -115,15 +79,16 @@ def errorMessage():  # Function that handles input errors
     button.pack()
 
 
-def graphInput(funcInput1, funcInput2, fig, canvas_widget,
+def graphInput(funcInput1, funcInput2, fig, canvas,
                x):  # Function that graphs an inputted equation with error handling
     global IVP1, IVP2
-    #XL = int(funcInput3.get("1.0", tk.END))
-    #XR = int(funcInput4.get("1.0", tk.END))
+    # XL = int(funcInput3.get("1.0", tk.END))
+    # XR = int(funcInput4.get("1.0", tk.END))
     inputString = funcInput2.get("1.0", tk.END)
-    print(inputString)
     try:
         if "y2" in inputString:
+            title = str(funcInput1.get("1.0", tk.END))
+            plt.title(title)
             inputString = inputString.replace("np.", "")
             lhs = parse_expr(inputString.split("=", 1)[0])
             rhs = parse_expr(inputString.split("=", 1)[1])
@@ -143,7 +108,7 @@ def graphInput(funcInput1, funcInput2, fig, canvas_widget,
             init_conditions = [IVP1, IVP2]
 
             # Time points
-            time = np.linspace(0, 10, 1001)
+            time = np.linspace(0, 5, 1001)
 
             # Define the system of ODEs using the solved equation
             def system_of_odes(y, t):
@@ -154,7 +119,9 @@ def graphInput(funcInput1, funcInput2, fig, canvas_widget,
 
             # Solve the ODE numerically
             solution = odeint(system_of_odes, init_conditions, time)
-            drawChart(fig, canvas_widget, time, solution[:, 0])
+            drawChart(fig, canvas, time, solution[:, 0])
+            title = funcInput1.get("1.0", tk.END).replace("*", "")
+            plt.title(title + "y(0) = " + str(IVP1) + ", y'(0) = " + str(IVP2))
             deleteText(funcInput1)
             deleteText(funcInput2)
         elif "y1" in inputString:
@@ -188,20 +155,26 @@ def graphInput(funcInput1, funcInput2, fig, canvas_widget,
 
             # Solve the ODE numerically
             solution = odeint(system_of_odes, init_condition, time)
-            drawChart(fig, canvas_widget, time, solution[:])
+            drawChart(fig, canvas, time, solution[:])
+            title = funcInput1.get("1.0", tk.END).replace("*", "")
+            plt.title(title + "y(0) = " + str(IVP1))
             deleteText(funcInput1)
             deleteText(funcInput2)
         elif "y0=" in inputString:
             inputString = inputString.split("=", 1)[1]
             x = np.linspace(-10, 10, 1001)
             y = np.full_like(x + 2, eval(inputString))
-            drawChart(fig, canvas_widget, x, y)
+            drawChart(fig, canvas, x, y)
+            title = funcInput1.get("1.0", tk.END).replace("*", "")
+            plt.title(title)
             deleteText(funcInput1)
             deleteText(funcInput2)
         else:
             x = np.linspace(-10, 10, 1001)
             y = np.full_like(x, eval(inputString))
-            drawChart(fig, canvas_widget, x, y)
+            drawChart(fig, canvas, x, y)
+            title = funcInput1.get("1.0", tk.END).replace("*", "")
+            plt.title(title)
             deleteText(funcInput1)
             deleteText(funcInput2)
 
@@ -212,7 +185,7 @@ def graphInput(funcInput1, funcInput2, fig, canvas_widget,
 
 
 def main():
-    global ax, canvas, start_x, start_y, IVP1, IVP2
+    global IVP1, IVP2
 
     # Window set up
     window = tk.Tk()
@@ -233,25 +206,23 @@ def main():
     ax.axhline(y=0, color='black', linewidth=1)
     canvas = FigureCanvasTkAgg(fig, master=window)
     canvas_widget = canvas.get_tk_widget()
-    canvas_widget.bind("<ButtonPress-1>", on_press)
-    canvas_widget.bind("<B1-Motion>", on_move)
 
     # Text box
     frm_txt = tk.Frame(master=window)
-    equationText = tk.Text(master=frm_txt, height=1, width=30, bg="white", fg="black")
+    equationText = tk.Text(master=frm_txt, wrap="word", height=1, width=30, bg="white", fg="black")
     equationText.config(state=tk.DISABLED)
     equationText.grid(row=0, column=0, columnspan=3)
 
-    calculationText = tk.Text(master=frm_txt)
+    calculationText = tk.Text(master=frm_txt, wrap="word")
     equationText.config(state=tk.DISABLED)
 
-    #spanXL = tk.Text(master=frm_txt, height=1, width=5, bg="white", fg="black")
-    #spanXR = tk.Text(master=frm_txt, height=1, width=5, bg="white", fg="black")
-    #spanLabel = tk.Label(master=frm_txt, text="<= x <=", height=1, width=5, fg="white")
+    # spanXL = tk.Text(master=frm_txt, height=1, width=5, bg="white", fg="black")
+    # spanXR = tk.Text(master=frm_txt, height=1, width=5, bg="white", fg="black")
+    # spanLabel = tk.Label(master=frm_txt, text="<= x <=", height=1, width=5, fg="white")
 
-    #spanXL.grid(row=1, column=0)
-    #spanLabel.grid(row=1, column=1)
-    #spanXR.grid(row=1, column=2)
+    # spanXL.grid(row=1, column=0)
+    # spanLabel.grid(row=1, column=1)
+    # spanXR.grid(row=1, column=2)
     # Button frame initializations
     frm_Buttons = tk.Frame(master=window)
 
@@ -403,7 +374,7 @@ def main():
     rightButton = tk.Button(master=frm_RButton, text="->", command=lambda: None)
     deleteButton = tk.Button(master=frm_RButton, text="Delete", command=lambda: None, width=5)
     equationButton = tk.Button(master=frm_RButton, text="Graph",
-                               command=lambda: graphInput(equationText, calculationText, fig, canvas_widget, x),
+                               command=lambda: graphInput(equationText, calculationText, fig, canvas, x),
                                width=10)
 
     functionButton.grid(row=0, column=0, columnspan=4, sticky="e")
