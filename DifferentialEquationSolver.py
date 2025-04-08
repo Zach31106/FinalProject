@@ -1,6 +1,6 @@
 import tkinter as tk
 import matplotlib.pyplot as plt
-from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg
+from matplotlib.backends.backend_tkagg import FigureCanvasTkAgg, NavigationToolbar2Tk
 import numpy as np
 from sympy import symbols, Eq, solve, lambdify
 from sympy.parsing.sympy_parser import parse_expr
@@ -40,17 +40,6 @@ def setValue(value, funcInput):
         return
 
 
-def drawChart(fig, canvas, x, y):  # Function that redraws a graph
-    fig.clear()
-    ax = fig.add_subplot()  # Reassign ax properly
-    ax.plot(x, y)
-    ax.grid(axis="both", color='gray', linestyle='--', linewidth=0.5)
-    ax.axvline(x=0, color='black', linewidth=1)
-    ax.axhline(y=0, color='black', linewidth=1)
-
-    canvas.draw_idle()
-
-
 def inputEntry(textBox1, function1, textBox2, function2):  # Function that types an input into a textbox
     textEntry1 = str(function1)
     textBox1.config(state=tk.NORMAL)
@@ -79,11 +68,46 @@ def errorMessage():  # Function that handles input errors
     button.pack()
 
 
-def graphInput(funcInput1, funcInput2, fig, canvas,
+def slope_field(f, x_range, y_range, step=0.2):
+    x, y = np.meshgrid(np.arange(x_range[0], x_range[1], step),
+                       np.arange(y_range[0], y_range[1], step))
+    u = np.ones_like(x)
+    v = f(x, y)
+    norm = np.sqrt(u ** 2 + v ** 2)
+    return x, y, u / norm, v / norm
+
+
+def plot_slope_field(f, x_range, y_range, ax):
+    x, y, u, v = slope_field(f, x_range, y_range)
+    ax.quiver(x, y, u, v, color='r')  # headwidth=3, headlength=5
+    ax.set_xlabel('x')
+    ax.set_ylabel('y')
+    ax.set_title('Slope Field')
+    ax.set_xlim(x_range)
+    ax.set_ylim(y_range)
+    ax.grid(True)
+
+
+def drawChart(fig, canvas, x, y, XL, XR, slope):  # Function that redraws a graph
+    fig.clear()
+    x_range = (XL, XR)
+    ax = fig.add_subplot()  # Reassign ax properly
+    ax.plot(x, y)
+    if slope:
+        plot_slope_field(slope, x_range, ax.get_ylim(), ax)
+    ax.set_xlim(x_range)
+    ax.grid(axis="both", color='gray', linestyle='--', linewidth=0.5)
+    ax.axvline(x=0, color='black', linewidth=1)
+    ax.axhline(y=0, color='black', linewidth=1)
+
+    canvas.draw_idle()
+
+
+def graphInput(funcInput1, funcInput2, funcInput3, funcInput4, fig, canvas,
                x):  # Function that graphs an inputted equation with error handling
     global IVP1, IVP2
-    # XL = int(funcInput3.get("1.0", tk.END))
-    # XR = int(funcInput4.get("1.0", tk.END))
+    XL = int(funcInput3.get("1.0", tk.END))
+    XR = int(funcInput4.get("1.0", tk.END))
     inputString = funcInput2.get("1.0", tk.END)
     try:
         if "y2" in inputString:
@@ -108,7 +132,7 @@ def graphInput(funcInput1, funcInput2, fig, canvas,
             init_conditions = [IVP1, IVP2]
 
             # Time points
-            time = np.linspace(0, 5, 1001)
+            time = np.linspace(XL, XR, 1001)
 
             # Define the system of ODEs using the solved equation
             def system_of_odes(y, t):
@@ -119,9 +143,9 @@ def graphInput(funcInput1, funcInput2, fig, canvas,
 
             # Solve the ODE numerically
             solution = odeint(system_of_odes, init_conditions, time)
-            drawChart(fig, canvas, time, solution[:, 0])
+            drawChart(fig, canvas, time, solution[:, 0], XL, XR, None)
             title = funcInput1.get("1.0", tk.END).replace("*", "")
-            plt.title(title + "y(0) = " + str(IVP1) + ", y'(0) = " + str(IVP2))
+            plt.title(title + "y(" + str(XL) + ") = " + str(IVP1) + ", y'(" + str(XL) + ") = " + str(IVP2))
             deleteText(funcInput1)
             deleteText(funcInput2)
         elif "y1" in inputString:
@@ -134,8 +158,8 @@ def graphInput(funcInput1, funcInput2, fig, canvas,
             # Define the differential equation
             differential_equation = Eq(lhs, rhs)
 
-            # Solve for y'' (y2)
-            y1 = solve(differential_equation, y1)[0]  # Extract y''
+            # Solve for y' (y1)
+            y1 = solve(differential_equation, y1)[0]  # Extract y'
 
             # Convert the symbolic solution into a numerical function
             y1_function = lambdify((x, y0), y1)
@@ -144,7 +168,7 @@ def graphInput(funcInput1, funcInput2, fig, canvas,
             init_condition = IVP1
 
             # Time points
-            time = np.linspace(0, 10, 1001)
+            time = np.linspace(XL, XR, 1001)
 
             # Define the system of ODEs using the solved equation
             def system_of_odes(y, t):
@@ -155,16 +179,16 @@ def graphInput(funcInput1, funcInput2, fig, canvas,
 
             # Solve the ODE numerically
             solution = odeint(system_of_odes, init_condition, time)
-            drawChart(fig, canvas, time, solution[:])
+            drawChart(fig, canvas, time, solution[:], XL, XR, y1_function)
             title = funcInput1.get("1.0", tk.END).replace("*", "")
-            plt.title(title + "y(0) = " + str(IVP1))
+            plt.title(title + "y(" + str(XL) + ") = " + str(IVP1))
             deleteText(funcInput1)
             deleteText(funcInput2)
         elif "y0=" in inputString:
             inputString = inputString.split("=", 1)[1]
             x = np.linspace(-10, 10, 1001)
             y = np.full_like(x + 2, eval(inputString))
-            drawChart(fig, canvas, x, y)
+            drawChart(fig, canvas, x, y, XL, XR, None)
             title = funcInput1.get("1.0", tk.END).replace("*", "")
             plt.title(title)
             deleteText(funcInput1)
@@ -172,7 +196,7 @@ def graphInput(funcInput1, funcInput2, fig, canvas,
         else:
             x = np.linspace(-10, 10, 1001)
             y = np.full_like(x, eval(inputString))
-            drawChart(fig, canvas, x, y)
+            drawChart(fig, canvas, x, y, XL, XR, None)
             title = funcInput1.get("1.0", tk.END).replace("*", "")
             plt.title(title)
             deleteText(funcInput1)
@@ -204,7 +228,8 @@ def main():
     ax.plot(x, y)
     ax.axvline(x=0, color='black', linewidth=1)
     ax.axhline(y=0, color='black', linewidth=1)
-    canvas = FigureCanvasTkAgg(fig, master=window)
+    frm_graph = tk.Frame(window)
+    canvas = FigureCanvasTkAgg(fig, master=frm_graph)
     canvas_widget = canvas.get_tk_widget()
 
     # Text box
@@ -216,13 +241,13 @@ def main():
     calculationText = tk.Text(master=frm_txt, wrap="word")
     equationText.config(state=tk.DISABLED)
 
-    # spanXL = tk.Text(master=frm_txt, height=1, width=5, bg="white", fg="black")
-    # spanXR = tk.Text(master=frm_txt, height=1, width=5, bg="white", fg="black")
-    # spanLabel = tk.Label(master=frm_txt, text="<= x <=", height=1, width=5, fg="white")
+    spanXL = tk.Text(master=frm_txt, height=1, width=5, bg="white", fg="black")
+    spanXR = tk.Text(master=frm_txt, height=1, width=5, bg="white", fg="black")
+    spanLabel = tk.Label(master=frm_txt, text="<= x <=", height=1, width=5, fg="white")
 
-    # spanXL.grid(row=1, column=0)
-    # spanLabel.grid(row=1, column=1)
-    # spanXR.grid(row=1, column=2)
+    spanXL.grid(row=1, column=0)
+    spanLabel.grid(row=1, column=1)
+    spanXR.grid(row=1, column=2)
     # Button frame initializations
     frm_Buttons = tk.Frame(master=window)
 
@@ -255,8 +280,8 @@ def main():
 
     IVP1Text = tk.Text(master=frm_LButton, height=1, width=5, bg="white", fg="black")
     IVP2Text = tk.Text(master=frm_LButton, height=1, width=5, bg="white", fg="black")
-    IVP1Button = tk.Button(master=frm_LButton, text="y(0)", command=lambda: setValue(IVP1, IVP1Text), width=2)
-    IVP2Button = tk.Button(master=frm_LButton, text="y'(0)", command=lambda: setValue(IVP2, IVP2Text), width=2)
+    IVP1Button = tk.Button(master=frm_LButton, text="y(x1)", command=lambda: setValue(IVP1, IVP1Text), width=2)
+    IVP2Button = tk.Button(master=frm_LButton, text="y'(x1)", command=lambda: setValue(IVP2, IVP2Text), width=2)
 
     xButton.grid(row=0, column=0, sticky="w")
     yButton.grid(row=0, column=1, sticky="w")
@@ -374,7 +399,8 @@ def main():
     rightButton = tk.Button(master=frm_RButton, text="->", command=lambda: None)
     deleteButton = tk.Button(master=frm_RButton, text="Delete", command=lambda: None, width=5)
     equationButton = tk.Button(master=frm_RButton, text="Graph",
-                               command=lambda: graphInput(equationText, calculationText, fig, canvas, x),
+                               command=lambda: graphInput(equationText, calculationText, spanXL, spanXR, fig, canvas,
+                                                          x),
                                width=10)
 
     functionButton.grid(row=0, column=0, columnspan=4, sticky="e")
@@ -395,8 +421,12 @@ def main():
     # Close window
     windowClose = tk.Button(master=window, text="Close Application", command=window.destroy)
 
-    # Widgets placement
-    canvas_widget.grid(row=0, column=0, padx=10, pady=10)
+    # Widgets placement (pack(side=tk.TOP, fill=tk.BOTH, expand=1))
+    canvas_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
+    toolbar = NavigationToolbar2Tk(canvas, frm_graph)
+    toolbar.children['!button4'].pack_forget()
+    toolbar.update()
+    frm_graph.grid(row=0, column=0, padx=10, pady=10)
     frm_txt.grid(row=1, column=0)
     frm_Buttons.grid(row=2, column=0)
     resetButton.grid(row=3, column=0, padx=10, pady=10, sticky="w")
