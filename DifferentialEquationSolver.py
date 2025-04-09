@@ -243,7 +243,7 @@ def main():
 
     spanXL = tk.Text(master=frm_txt, height=1, width=5, bg="white", fg="black")
     spanXR = tk.Text(master=frm_txt, height=1, width=5, bg="white", fg="black")
-    spanLabel = tk.Label(master=frm_txt, text="<= x <=", height=1, width=5, fg="white")
+    spanLabel = tk.Label(master=frm_txt, text="<= x <=", height=1, width=5, fg="gray")
 
     spanXL.grid(row=1, column=0)
     spanLabel.grid(row=1, column=1)
