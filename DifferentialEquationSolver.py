@@ -106,8 +106,16 @@ def drawChart(fig, canvas, x, y, XL, XR, slope):  # Function that redraws a grap
 def graphInput(funcInput1, funcInput2, funcInput3, funcInput4, fig, canvas,
                x):  # Function that graphs an inputted equation with error handling
     global IVP1, IVP2
-    XL = int(funcInput3.get("1.0", tk.END))
-    XR = int(funcInput4.get("1.0", tk.END))
+    input_value = funcInput3.get("1.0", tk.END).strip()
+    if input_value:  # Check if input is not empty
+        XL = int(input_value)
+    else:
+        XL = -1
+    input_value_2 = funcInput4.get("1.0", tk.END).strip()
+    if input_value_2:  # Check if input is not empty
+        XR = int(input_value_2)
+    else:
+        XR = 1
     inputString = funcInput2.get("1.0", tk.END)
     try:
         if "y2" in inputString:
@@ -280,8 +288,8 @@ def main():
 
     IVP1Text = tk.Text(master=frm_LButton, height=1, width=5, bg="white", fg="black")
     IVP2Text = tk.Text(master=frm_LButton, height=1, width=5, bg="white", fg="black")
-    IVP1Button = tk.Button(master=frm_LButton, text="y(x1)", command=lambda: setValue(IVP1, IVP1Text), width=2)
-    IVP2Button = tk.Button(master=frm_LButton, text="y'(x1)", command=lambda: setValue(IVP2, IVP2Text), width=2)
+    IVP1Button = tk.Button(master=frm_LButton, text="y(x1)", command=lambda: setValue(IVP1, IVP1Text), width=4)
+    IVP2Button = tk.Button(master=frm_LButton, text="y'(x1)", command=lambda: setValue(IVP2, IVP2Text), width=4)
 
     xButton.grid(row=0, column=0, sticky="w")
     yButton.grid(row=0, column=1, sticky="w")
