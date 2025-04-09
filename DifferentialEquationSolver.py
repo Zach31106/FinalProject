@@ -48,7 +48,7 @@ def step_function(x):
 
 
 def impulse_function(a):
-    return (100000 * step_function(a + 0.1)) - (100000 * step_function(a - 0.1))
+    return (5 * step_function(a + 0.1)) - (5 * step_function(a - 0.1))
 
 
 def inputEntry(textBox1, function1, textBox2, function2):  # Function that types an input into a textbox
@@ -175,7 +175,7 @@ def graphInput(funcInput1, funcInput2, funcInput3, funcInput4, fig, canvas,
             init_conditions = [IVP1, IVP2]
 
             # Time points
-            time = np.linspace(XL, XR, 100000)
+            time = np.linspace(XL, XR, 1001)
 
             # Define the system of ODEs using the solved equation
             def system_of_odes(y, t):
@@ -211,7 +211,7 @@ def graphInput(funcInput1, funcInput2, funcInput3, funcInput4, fig, canvas,
             init_condition = IVP1
 
             # Time points
-            time = np.linspace(XL, XR, 100000000000)
+            time = np.linspace(XL, XR, 1001)
 
             # Define the system of ODEs using the solved equation
             def system_of_odes(y, t):
@@ -229,7 +229,7 @@ def graphInput(funcInput1, funcInput2, funcInput3, funcInput4, fig, canvas,
             deleteText(funcInput2)
         elif "y0=" in inputString:
             inputString = inputString.split("=", 1)[1]
-            x = np.linspace(XL, XR, 100000)
+            x = np.linspace(XL, XR, 1001)
             y = np.full_like(x, eval(inputString))
             drawChart(fig, canvas, x, y, XL, XR, None)
             title = funcInput1.get("1.0", tk.END).replace("*", "")
@@ -237,7 +237,7 @@ def graphInput(funcInput1, funcInput2, funcInput3, funcInput4, fig, canvas,
             deleteText(funcInput1)
             deleteText(funcInput2)
         else:
-            x = np.linspace(XL, XR, 100000)
+            x = np.linspace(XL, XR, 1001)
             y = np.full_like(x, eval(inputString))
             drawChart(fig, canvas, x, y, XL, XR, None)
             title = funcInput1.get("1.0", tk.END).replace("*", "")
