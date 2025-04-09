@@ -8,6 +8,7 @@ from scipy.integrate import odeint
 
 IVP1 = 0
 IVP2 = 0
+input_stack = []
 
 
 def showButtons(frame):  # Function that shows groups of buttons
@@ -28,19 +29,31 @@ def deleteText(funcInput):  # Function that clears a text box
 def setValue(value, funcInput):
     global IVP1, IVP2
     try:
-        if value == IVP1:
+        if value == "IVP1":
             IVP1 = int(funcInput.get("1.0", tk.END))
             deleteText(funcInput)
             funcInput.config(state=tk.NORMAL)
-        elif value == IVP2:
+            print(IVP1, IVP2)
+        if value == "IVP2":
             IVP2 = int(funcInput.get("1.0", tk.END))
             deleteText(funcInput)
             funcInput.config(state=tk.NORMAL)
+            print(IVP1, IVP2)
     except ValueError:
         return
 
 
+def step_function(x):
+    return np.where(x >= 0, 1, 0)
+
+
+def impulse_function(a):
+    return (100000 * step_function(a + 0.1)) - (100000 * step_function(a - 0.1))
+
+
 def inputEntry(textBox1, function1, textBox2, function2):  # Function that types an input into a textbox
+    global input_stack
+
     textEntry1 = str(function1)
     textBox1.config(state=tk.NORMAL)
     textBox1.insert(tk.END, textEntry1)
@@ -49,6 +62,28 @@ def inputEntry(textBox1, function1, textBox2, function2):  # Function that types
     textEntry2 = str(function2)
     textBox2.config(state=tk.NORMAL)
     textBox2.insert(tk.END, textEntry2)
+    textBox2.config(state=tk.DISABLED)
+
+    input_stack.append((textEntry1, textEntry2))
+
+
+def deleteLastInput(textBox1, textBox2):
+    global input_stack
+    if not input_stack:
+        return
+
+    last_entry1, last_entry2 = input_stack.pop()
+
+    textBox1.config(state=tk.NORMAL)
+    current1 = textBox1.get("1.0", tk.END)
+    textBox1.delete("1.0", tk.END)
+    textBox1.insert("1.0", current1.rstrip().rsplit(last_entry1, 1)[0])
+    textBox1.config(state=tk.DISABLED)
+
+    textBox2.config(state=tk.NORMAL)
+    current2 = textBox2.get("1.0", tk.END)
+    textBox2.delete("1.0", tk.END)
+    textBox2.insert("1.0", current2.rstrip().rsplit(last_entry2, 1)[0])
     textBox2.config(state=tk.DISABLED)
 
 
@@ -79,7 +114,7 @@ def slope_field(f, x_range, y_range, step=0.2):
 
 def plot_slope_field(f, x_range, y_range, ax):
     x, y, u, v = slope_field(f, x_range, y_range)
-    ax.quiver(x, y, u, v, color='r')  # headwidth=3, headlength=5
+    ax.quiver(x, y, u, v, color='blue')
     ax.set_xlabel('x')
     ax.set_ylabel('y')
     ax.set_title('Slope Field')
@@ -92,7 +127,7 @@ def drawChart(fig, canvas, x, y, XL, XR, slope):  # Function that redraws a grap
     fig.clear()
     x_range = (XL, XR)
     ax = fig.add_subplot()  # Reassign ax properly
-    ax.plot(x, y)
+    ax.plot(x, y, color='black')
     if slope:
         plot_slope_field(slope, x_range, ax.get_ylim(), ax)
     ax.set_xlim(x_range)
@@ -108,12 +143,12 @@ def graphInput(funcInput1, funcInput2, funcInput3, funcInput4, fig, canvas,
     global IVP1, IVP2
     input_value = funcInput3.get("1.0", tk.END).strip()
     if input_value:  # Check if input is not empty
-        XL = int(input_value)
+        XL = float(input_value)
     else:
         XL = 0
     input_value_2 = funcInput4.get("1.0", tk.END).strip()
     if input_value_2:  # Check if input is not empty
-        XR = int(input_value_2)
+        XR = float(input_value_2)
     else:
         XR = 1
     inputString = funcInput2.get("1.0", tk.END)
@@ -134,13 +169,13 @@ def graphInput(funcInput1, funcInput2, funcInput3, funcInput4, fig, canvas,
             y2 = solve(differential_equation, y2)[0]  # Extract y''
 
             # Convert the symbolic solution into a numerical function
-            y2_function = lambdify((x, y0, y1), y2)
+            y2_function = lambdify((x, y0, y1), y2, modules=['numpy', {'step_function': step_function}, {'impulse_function': impulse_function}])
 
             # Initial conditions: [y(0), y'(0)]
             init_conditions = [IVP1, IVP2]
 
             # Time points
-            time = np.linspace(XL, XR, 1001)
+            time = np.linspace(XL, XR, 100000)
 
             # Define the system of ODEs using the solved equation
             def system_of_odes(y, t):
@@ -170,13 +205,13 @@ def graphInput(funcInput1, funcInput2, funcInput3, funcInput4, fig, canvas,
             y1 = solve(differential_equation, y1)[0]  # Extract y'
 
             # Convert the symbolic solution into a numerical function
-            y1_function = lambdify((x, y0), y1)
+            y1_function = lambdify((x, y0), y1, modules=['numpy', {'step_function': step_function}, {'impulse_function': impulse_function}])
 
             # Initial conditions: [y(0), y'(0)]
             init_condition = IVP1
 
             # Time points
-            time = np.linspace(XL, XR, 1001)
+            time = np.linspace(XL, XR, 100000000000)
 
             # Define the system of ODEs using the solved equation
             def system_of_odes(y, t):
@@ -194,15 +229,15 @@ def graphInput(funcInput1, funcInput2, funcInput3, funcInput4, fig, canvas,
             deleteText(funcInput2)
         elif "y0=" in inputString:
             inputString = inputString.split("=", 1)[1]
-            x = np.linspace(-10, 10, 1001)
-            y = np.full_like(x + 2, eval(inputString))
+            x = np.linspace(XL, XR, 100000)
+            y = np.full_like(x, eval(inputString))
             drawChart(fig, canvas, x, y, XL, XR, None)
             title = funcInput1.get("1.0", tk.END).replace("*", "")
             plt.title(title)
             deleteText(funcInput1)
             deleteText(funcInput2)
         else:
-            x = np.linspace(-10, 10, 1001)
+            x = np.linspace(XL, XR, 100000)
             y = np.full_like(x, eval(inputString))
             drawChart(fig, canvas, x, y, XL, XR, None)
             title = funcInput1.get("1.0", tk.END).replace("*", "")
@@ -224,6 +259,7 @@ def main():
     window.title("Differential Equation Visualizer and Solver")
     window.geometry("550x800")
     window.resizable(width=False, height=False)
+    #window.configure(background="black")
     window.eval("tk::PlaceWindow . center")
 
     # x and y
@@ -288,8 +324,8 @@ def main():
 
     IVP1Text = tk.Text(master=frm_LButton, height=1, width=5, bg="white", fg="black")
     IVP2Text = tk.Text(master=frm_LButton, height=1, width=5, bg="white", fg="black")
-    IVP1Button = tk.Button(master=frm_LButton, text="y(x1)", command=lambda: setValue(IVP1, IVP1Text), width=4)
-    IVP2Button = tk.Button(master=frm_LButton, text="y'(x1)", command=lambda: setValue(IVP2, IVP2Text), width=4)
+    IVP1Button = tk.Button(master=frm_LButton, text="y(x1)", command=lambda: setValue("IVP1", IVP1Text), width=2)
+    IVP2Button = tk.Button(master=frm_LButton, text="y'(x1)", command=lambda: setValue("IVP2", IVP2Text), width=2)
 
     xButton.grid(row=0, column=0, sticky="w")
     yButton.grid(row=0, column=1, sticky="w")
@@ -389,6 +425,12 @@ def main():
                                                            frm_functions))
     lnButton = tk.Button(master=frm_functions, text="ln()",
                          command=lambda: functionInput(equationText, "ln(", calculationText, "np.log(", frm_functions))
+    stepButton = tk.Button(master=frm_functions, text="u(x-a)",
+                           command=lambda: functionInput(equationText, "u(", calculationText, "step_function(",
+                                                         frm_functions))
+    impulseButton = tk.Button(master=frm_functions, text="δ(x-a)",
+                              command=lambda: functionInput(equationText, "δ(", calculationText, "impulse_function(",
+                                                            frm_functions))
     exitButton = tk.Button(master=frm_functions, text="Exit", command=lambda: hideButtons(frm_functions))
 
     sineButton.grid(row=0, column=0)
@@ -400,22 +442,21 @@ def main():
     arctanButton.grid(row=1, column=2)
 
     lnButton.grid(row=2, column=0)
+    stepButton.grid(row=2, column=1)
+    impulseButton.grid(row=2, column=2)
 
     exitButton.grid(row=3, column=2, sticky="e")
 
-    leftButton = tk.Button(master=frm_RButton, text="<-", command=lambda: None)
-    rightButton = tk.Button(master=frm_RButton, text="->", command=lambda: None)
-    deleteButton = tk.Button(master=frm_RButton, text="Delete", command=lambda: None, width=5)
+    deleteButton = tk.Button(master=frm_RButton, text="Delete",
+                             command=lambda: deleteLastInput(equationText, calculationText), width=5)
     equationButton = tk.Button(master=frm_RButton, text="Graph",
                                command=lambda: graphInput(equationText, calculationText, spanXL, spanXR, fig, canvas,
                                                           x),
                                width=10)
 
     functionButton.grid(row=0, column=0, columnspan=4, sticky="e")
-    leftButton.grid(row=1, column=0, columnspan=2, sticky="nsew")
-    rightButton.grid(row=1, column=2, columnspan=2, sticky="nsew")
-    deleteButton.grid(row=2, column=2, columnspan=2)
-    equationButton.grid(row=3, column=0, columnspan=4, sticky="e")
+    deleteButton.grid(row=1, column=2, columnspan=2)
+    equationButton.grid(row=2, column=0, columnspan=4, sticky="e")
 
     # Frame Placements
     frm_LButton.grid(row=0, column=0)
