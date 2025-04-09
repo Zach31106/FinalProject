@@ -110,7 +110,7 @@ def graphInput(funcInput1, funcInput2, funcInput3, funcInput4, fig, canvas,
     if input_value:  # Check if input is not empty
         XL = int(input_value)
     else:
-        XL = -1
+        XL = 0
     input_value_2 = funcInput4.get("1.0", tk.END).strip()
     if input_value_2:  # Check if input is not empty
         XR = int(input_value_2)
