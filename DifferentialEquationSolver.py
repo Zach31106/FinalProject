@@ -12,7 +12,7 @@ input_stack = []
 
 
 def showButtons(frame):  # Function that shows groups of buttons
-    frame.grid(row=1, column=0)
+    frame.grid(row=2, column=0)
     frame.update_idletasks()
 
 
@@ -26,7 +26,7 @@ def deleteText(funcInput):  # Function that clears a text box
     funcInput.config(state=tk.DISABLED)
 
 
-def setValue(value, funcInput):
+def setValue(value, funcInput):  # Function that sets initial conditions
     global IVP1, IVP2
     try:
         if value == "IVP1":
@@ -43,11 +43,11 @@ def setValue(value, funcInput):
         return
 
 
-def step_function(x):
+def step_function(x):  # Function that represents the step function
     return np.where(x >= 0, 1, 0)
 
 
-def impulse_function(a):
+def impulse_function(a):  # Funtion that gives an estimate for the dirac-delta function
     return (5 * step_function(a + 0.1)) - (5 * step_function(a - 0.1))
 
 
@@ -67,7 +67,7 @@ def inputEntry(textBox1, function1, textBox2, function2):  # Function that types
     input_stack.append((textEntry1, textEntry2))
 
 
-def deleteLastInput(textBox1, textBox2):
+def deleteLastInput(textBox1, textBox2):  # Function that deletes the last inputted item
     global input_stack
     if not input_stack:
         return
@@ -103,7 +103,20 @@ def errorMessage():  # Function that handles input errors
     button.pack()
 
 
-def slope_field(f, x_range, y_range, step=0.2):
+def instructions():  # Functions that displays instructions
+    instructions_window = tk.Tk()
+    instructions_window.title("Instructions")
+    instructions_window.resizable(width=False, height=False)
+    # instructions_window.eval("tk::PlaceWindow . center")
+    label = tk.Label(instructions_window,
+                     text="This is a graphing calculator that allows for differential equations. For a normal equation, press the buttons that correspond to your equation then enter graph.\n Functions like sine and the natural logarithm can be found through the functions button. For differential equations, first type in your initial values and hit their corresponding button.\n Next, set the range for solving. The left most bound will be where your initial conditions are set. Now you can enter your equation, hit graph, and see the solution.",
+                     font=("Arial", 12))
+    label.pack(pady=20)
+    button = tk.Button(instructions_window, text="Close", command=instructions_window.destroy)
+    button.pack()
+
+
+def slope_field(f, x_range, y_range, step=0.2):  # Function that solves a slope field
     x, y = np.meshgrid(np.arange(x_range[0], x_range[1], step),
                        np.arange(y_range[0], y_range[1], step))
     u = np.ones_like(x)
@@ -112,7 +125,7 @@ def slope_field(f, x_range, y_range, step=0.2):
     return x, y, u / norm, v / norm
 
 
-def plot_slope_field(f, x_range, y_range, ax):
+def plot_slope_field(f, x_range, y_range, ax):  # Function that plots a slope field
     x, y, u, v = slope_field(f, x_range, y_range)
     ax.quiver(x, y, u, v, color='blue')
     ax.set_xlabel('x')
@@ -123,10 +136,10 @@ def plot_slope_field(f, x_range, y_range, ax):
     ax.grid(True)
 
 
-def drawChart(fig, canvas, x, y, XL, XR, slope):  # Function that redraws a graph
+def drawChart(fig, canvas, x, y, XL, XR, slope):  # Function that draws the graph
     fig.clear()
     x_range = (XL, XR)
-    ax = fig.add_subplot()  # Reassign ax properly
+    ax = fig.add_subplot()
     ax.plot(x, y, color='black')
     if slope:
         plot_slope_field(slope, x_range, ax.get_ylim(), ax)
@@ -142,12 +155,12 @@ def graphInput(funcInput1, funcInput2, funcInput3, funcInput4, fig, canvas,
                x):  # Function that graphs an inputted equation with error handling
     global IVP1, IVP2
     input_value = funcInput3.get("1.0", tk.END).strip()
-    if input_value:  # Check if input is not empty
+    if input_value:
         XL = float(input_value)
     else:
         XL = 0
     input_value_2 = funcInput4.get("1.0", tk.END).strip()
-    if input_value_2:  # Check if input is not empty
+    if input_value_2:
         XR = float(input_value_2)
     else:
         XR = 1
@@ -169,7 +182,8 @@ def graphInput(funcInput1, funcInput2, funcInput3, funcInput4, fig, canvas,
             y2 = solve(differential_equation, y2)[0]  # Extract y''
 
             # Convert the symbolic solution into a numerical function
-            y2_function = lambdify((x, y0, y1), y2, modules=['numpy', {'step_function': step_function}, {'impulse_function': impulse_function}])
+            y2_function = lambdify((x, y0, y1), y2, modules=['numpy', {'step_function': step_function},
+                                                             {'impulse_function': impulse_function}])
 
             # Initial conditions: [y(0), y'(0)]
             init_conditions = [IVP1, IVP2]
@@ -195,32 +209,20 @@ def graphInput(funcInput1, funcInput2, funcInput3, funcInput4, fig, canvas,
             inputString = inputString.replace("np.", "")
             lhs = parse_expr(inputString.split("=", 1)[0])
             rhs = parse_expr(inputString.split("=", 1)[1])
-            # Define symbolic variables
             x, y1, y0 = symbols('x, y1 y0')
-
-            # Define the differential equation
             differential_equation = Eq(lhs, rhs)
-
-            # Solve for y' (y1)
-            y1 = solve(differential_equation, y1)[0]  # Extract y'
-
-            # Convert the symbolic solution into a numerical function
-            y1_function = lambdify((x, y0), y1, modules=['numpy', {'step_function': step_function}, {'impulse_function': impulse_function}])
-
-            # Initial conditions: [y(0), y'(0)]
+            y1 = solve(differential_equation, y1)[0]
+            y1_function = lambdify((x, y0), y1, modules=['numpy', {'step_function': step_function},
+                                                         {'impulse_function': impulse_function}])
             init_condition = IVP1
-
-            # Time points
             time = np.linspace(XL, XR, 1001)
 
-            # Define the system of ODEs using the solved equation
             def system_of_odes(y, t):
                 y0 = y
                 x = t
                 y1 = y1_function(x, y0)
                 return y1
 
-            # Solve the ODE numerically
             solution = odeint(system_of_odes, init_condition, time)
             drawChart(fig, canvas, time, solution[:], XL, XR, y1_function)
             title = funcInput1.get("1.0", tk.END).replace("*", "")
@@ -258,9 +260,9 @@ def main():
     window = tk.Tk()
     window.title("Differential Equation Visualizer and Solver")
     window.geometry("550x800")
+    window.configure(background="#333333")
     window.resizable(width=False, height=False)
-    #window.configure(background="black")
-    window.eval("tk::PlaceWindow . center")
+    # window.eval("tk::PlaceWindow . center")
 
     # x and y
     x = np.linspace(-10, 10, 10000)
@@ -276,6 +278,9 @@ def main():
     canvas = FigureCanvasTkAgg(fig, master=frm_graph)
     canvas_widget = canvas.get_tk_widget()
 
+    # Instructions
+    instructionsButton = tk.Button(window, text="Differential Equation Visualizer", command=instructions)
+
     # Text box
     frm_txt = tk.Frame(master=window)
     equationText = tk.Text(master=frm_txt, wrap="word", height=1, width=30, bg="white", fg="black")
@@ -287,7 +292,7 @@ def main():
 
     spanXL = tk.Text(master=frm_txt, height=1, width=5, bg="white", fg="black")
     spanXR = tk.Text(master=frm_txt, height=1, width=5, bg="white", fg="black")
-    spanLabel = tk.Label(master=frm_txt, text="<= x <=", height=1, width=5, fg="gray")
+    spanLabel = tk.Label(master=frm_txt, text="<= x <=", height=1, width=5)
 
     spanXL.grid(row=1, column=0)
     spanLabel.grid(row=1, column=1)
@@ -470,26 +475,29 @@ def main():
     # Close window
     windowClose = tk.Button(master=window, text="Close Application", command=window.destroy)
 
-    # Widgets placement (pack(side=tk.TOP, fill=tk.BOTH, expand=1))
+    # Widgets placement
     canvas_widget.pack(side=tk.TOP, fill=tk.BOTH, expand=1)
     toolbar = NavigationToolbar2Tk(canvas, frm_graph)
     toolbar.children['!button4'].pack_forget()
     toolbar.update()
-    frm_graph.grid(row=0, column=0, padx=10, pady=10)
-    frm_txt.grid(row=1, column=0)
-    frm_Buttons.grid(row=2, column=0)
-    resetButton.grid(row=3, column=0, padx=10, pady=10, sticky="w")
-    windowClose.grid(row=3, column=0, padx=10, pady=10, sticky="e")
+    instructionsButton.grid(row=0, column=0)
+    frm_graph.grid(row=1, column=0, padx=10, pady=10)
+    frm_txt.grid(row=2, column=0)
+    frm_Buttons.grid(row=3, column=0)
+    resetButton.grid(row=4, column=0, padx=10, pady=10, sticky="w")
+    windowClose.grid(row=4, column=0, padx=10, pady=10, sticky="e")
 
     # Row and column configuration
-    window.rowconfigure(0, weight=1)
+    window.rowconfigure(0, weight=0)
     window.columnconfigure(0, weight=1)
 
     window.rowconfigure(1, weight=0)
 
-    window.rowconfigure(2, weight=1)
+    window.rowconfigure(2, weight=0)
 
     window.rowconfigure(3, weight=0)
+
+    window.rowconfigure(4, weight=0)
 
     # Window main loop
     window.mainloop()
