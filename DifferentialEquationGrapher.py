@@ -58,8 +58,9 @@ class GraphPlane:
     def step_function(x):  # Function that represents the step function
         return np.where(x >= 0, 1, 0)
 
-    def impulse_function(self, a):  # Function that gives an estimate for the dirac-delta function
-        return (5 * self.step_function(a + 0.1)) - (5 * self.step_function(a - 0.1))
+    @classmethod
+    def impulse_function(cls, a):# Function that gives an estimate for the dirac-delta function
+        return (5 * cls.step_function(a + 0.1)) - (5 * cls.step_function(a - 0.1))
 
     @classmethod
     def inputEntry(cls, textBox1, function1, textBox2, function2):  # Function that types an input into a textbox
@@ -239,7 +240,7 @@ class GraphPlane:
             elif "y0=" in inputString:
                 inputString = inputString.split("=", 1)[1]
                 x = np.linspace(XL, XR, 1001)
-                y = np.full_like(x, eval(inputString))
+                y = np.full_like(x, eval(inputString, {"np": np, "step_function": cls.step_function, "x": x}, {"np": np, "impulse_function": cls.impulse_function, "x": x}))
                 cls.drawChart(fig, canvas, x, y, XL, XR, None)
                 title = funcInput1.get("1.0", tk.END).replace("*", "")
                 plt.title(title)
@@ -247,7 +248,7 @@ class GraphPlane:
                 cls.deleteText(funcInput2)
             else:
                 x = np.linspace(XL, XR, 1001)
-                y = np.full_like(x, eval(inputString))
+                y = np.full_like(x, eval(inputString, {"np": np, "step_function": cls.step_function, "x": x}, {"np": np, "impulse_function": cls.impulse_function, "x": x}))
                 cls.drawChart(fig, canvas, x, y, XL, XR, None)
                 title = funcInput1.get("1.0", tk.END).replace("*", "")
                 plt.title(title)
@@ -264,7 +265,7 @@ class GraphPlane:
         self.window.geometry(f"{self.size[0]}x{self.size[1]}")
         self.window.configure(background=self.color)
         self.window.resizable(width=False, height=False)
-        #self.window.eval("tk::PlaceWindow . center")
+        # self.window.eval("tk::PlaceWindow . center")
         return self.window
 
     def graphInitialization(self):
@@ -278,7 +279,6 @@ class GraphPlane:
         toolbar.children['!button4'].pack_forget()
         toolbar.update()
         self.frm_graph.grid(row=1, column=0, padx=10, pady=10)
-
 
     def widgetsCreationAndPlacement(self):
         # Instructions
@@ -322,9 +322,11 @@ class GraphPlane:
         squareButton = tk.Button(master=frm_LButton, text="^2",
                                  command=lambda: self.inputEntry(equationText, "^2", calculationText, "**2"), width=2)
         absoluteButton = tk.Button(master=frm_LButton, text="||",
-                                   command=lambda: self.inputEntry(equationText, "abs(", calculationText, "abs("), width=2)
+                                   command=lambda: self.inputEntry(equationText, "abs(", calculationText, "abs("),
+                                   width=2)
         sqrtButton = tk.Button(master=frm_LButton, text="√",
-                               command=lambda: self.inputEntry(equationText, "√(", calculationText, "np.sqrt("), width=2)
+                               command=lambda: self.inputEntry(equationText, "√(", calculationText, "np.sqrt("),
+                               width=2)
         piButton = tk.Button(master=frm_LButton, text="π",
                              command=lambda: self.inputEntry(equationText, "π", calculationText, "np.pi"), width=2)
         eButton = tk.Button(master=frm_LButton, text="e",
@@ -332,8 +334,10 @@ class GraphPlane:
 
         IVP1Text = tk.Text(master=frm_LButton, height=1, width=5, bg="white", fg="black")
         IVP2Text = tk.Text(master=frm_LButton, height=1, width=5, bg="white", fg="black")
-        IVP1Button = tk.Button(master=frm_LButton, text="y(x1)", command=lambda: self.setValue("IVP1", IVP1Text), width=2)
-        IVP2Button = tk.Button(master=frm_LButton, text="y'(x1)", command=lambda: self.setValue("IVP2", IVP2Text), width=2)
+        IVP1Button = tk.Button(master=frm_LButton, text="y(x1)", command=lambda: self.setValue("IVP1", IVP1Text),
+                               width=2)
+        IVP2Button = tk.Button(master=frm_LButton, text="y'(x1)", command=lambda: self.setValue("IVP2", IVP2Text),
+                               width=2)
 
         xButton.grid(row=0, column=0, sticky="w")
         yButton.grid(row=0, column=1, sticky="w")
@@ -413,37 +417,41 @@ class GraphPlane:
         # Right Buttons
         frm_RButton = tk.Frame(master=frm_Buttons)
 
-        functionButton = tk.Button(master=frm_RButton, text="Functions", command=lambda: self.showButtons(frm_functions),
+        functionButton = tk.Button(master=frm_RButton, text="Functions",
+                                   command=lambda: self.showButtons(frm_functions),
                                    width=10)
         frm_functions = tk.Frame(master=self.window)
         cosineButton = tk.Button(master=frm_functions, text="cos()",
                                  command=lambda: self.functionInput(equationText, "cos(", calculationText, "np.cos(",
-                                                               frm_functions))
+                                                                    frm_functions))
         sineButton = tk.Button(master=frm_functions, text="sin()",
                                command=lambda: self.functionInput(equationText, "sin(", calculationText, "np.sin(",
-                                                             frm_functions))
+                                                                  frm_functions))
         tangentButton = tk.Button(master=frm_functions, text="tan()",
                                   command=lambda: self.functionInput(equationText, "tan(", calculationText, "np.tan(",
-                                                                frm_functions))
+                                                                     frm_functions))
         arcsinButton = tk.Button(master=frm_functions, text="arcsin()",
-                                 command=lambda: self.functionInput(equationText, "arcsin(", calculationText, "np.arcsin(",
-                                                               frm_functions))
+                                 command=lambda: self.functionInput(equationText, "arcsin(", calculationText,
+                                                                    "np.arcsin(",
+                                                                    frm_functions))
         arccosButton = tk.Button(master=frm_functions, text="arccos()",
-                                 command=lambda: self.functionInput(equationText, "arccos(", calculationText, "np.arccos(",
-                                                               frm_functions))
+                                 command=lambda: self.functionInput(equationText, "arccos(", calculationText,
+                                                                    "np.arccos(",
+                                                                    frm_functions))
         arctanButton = tk.Button(master=frm_functions, text="arctan()",
-                                 command=lambda: self.functionInput(equationText, "arctan(", calculationText, "np.arctan(",
-                                                               frm_functions))
+                                 command=lambda: self.functionInput(equationText, "arctan(", calculationText,
+                                                                    "np.arctan(",
+                                                                    frm_functions))
         lnButton = tk.Button(master=frm_functions, text="ln()",
                              command=lambda: self.functionInput(equationText, "ln(", calculationText, "np.log(",
-                                                           frm_functions))
+                                                                frm_functions))
         stepButton = tk.Button(master=frm_functions, text="u(x-a)",
                                command=lambda: self.functionInput(equationText, "u(", calculationText, "step_function(",
-                                                             frm_functions))
+                                                                  frm_functions))
         impulseButton = tk.Button(master=frm_functions, text="δ(x-a)",
                                   command=lambda: self.functionInput(equationText, "δ(", calculationText,
-                                                                "impulse_function(",
-                                                                frm_functions))
+                                                                     "impulse_function(",
+                                                                     frm_functions))
         exitButton = tk.Button(master=frm_functions, text="Exit", command=lambda: self.hideButtons(frm_functions))
 
         sineButton.grid(row=0, column=0)
@@ -463,9 +471,10 @@ class GraphPlane:
         deleteButton = tk.Button(master=frm_RButton, text="Delete",
                                  command=lambda: self.deleteLastInput(equationText, calculationText), width=5)
         equationButton = tk.Button(master=frm_RButton, text="Graph",
-                                   command=lambda: self.graphInput(equationText, calculationText, spanXL, spanXR, self.fig,
-                                                              self.canvas,
-                                                              self.x),
+                                   command=lambda: self.graphInput(equationText, calculationText, spanXL, spanXR,
+                                                                   self.fig,
+                                                                   self.canvas,
+                                                                   self.x),
                                    width=10)
 
         functionButton.grid(row=0, column=0, columnspan=4, sticky="e")
@@ -503,12 +512,14 @@ class GraphPlane:
         runWindow = self.windowCreate()
         runWindow.mainloop()
 
+
 def main():
     window = GraphPlane("Calculator", (550, 800), "#333333", "diffEq")
     window.graphInitialization()
     window.widgetsCreationAndPlacement()
     window.rowColumnSetup()
     window.runProgram()
+
 
 if __name__ == "__main__":
     main()
